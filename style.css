@@ -1,0 +1,315 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #121213;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 500px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Header */
+header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    border-bottom: 1px solid #3a3a3c;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Message display */
+.message {
+    min-height: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: opacity 0.3s ease;
+}
+
+.message.success {
+    color: #538d4e;
+    background-color: rgba(83, 141, 78, 0.1);
+}
+
+.message.error {
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.message.game-over {
+    color: #818384;
+    background-color: rgba(129, 131, 132, 0.1);
+}
+
+/* Game board */
+.board {
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    gap: 5px;
+    margin: 20px 0;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+}
+
+.tile {
+    width: 62px;
+    height: 62px;
+    border: 2px solid #3a3a3c;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: border-color 0.1s ease;
+}
+
+.tile.filled {
+    border-color: #565758;
+}
+
+/* Tile color states */
+.tile.correct {
+    background-color: #538d4e;
+    border-color: #538d4e;
+    color: #fff;
+}
+
+.tile.present {
+    background-color: #b59f3b;
+    border-color: #b59f3b;
+    color: #fff;
+}
+
+.tile.absent {
+    background-color: #3a3a3c;
+    border-color: #3a3a3c;
+    color: #fff;
+}
+
+/* Animations */
+@keyframes pop {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.1); 
+    }
+}
+
+.tile.pop {
+    animation: pop 0.15s ease-in-out;
+}
+
+@keyframes flip {
+    0% { 
+        transform: rotateX(0); 
+    }
+    50% { 
+        transform: rotateX(90deg); 
+    }
+    100% { 
+        transform: rotateX(0); 
+    }
+}
+
+.tile.flip {
+    animation: flip 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { 
+        transform: translateX(0); 
+    }
+    10%, 30%, 50%, 70%, 90% { 
+        transform: translateX(-5px); 
+    }
+    20%, 40%, 60%, 80% { 
+        transform: translateX(5px); 
+    }
+}
+
+.row.shake {
+    animation: shake 0.4s ease-in-out;
+}
+
+/* Keyboard */
+.keyboard {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.key {
+    min-width: 43px;
+    height: 58px;
+    background-color: #818384;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.1s ease, transform 0.05s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.key:hover {
+    opacity: 0.9;
+}
+
+.key:active {
+    transform: scale(0.95);
+}
+
+.key.wide {
+    min-width: 65px;
+    font-size: 12px;
+}
+
+/* Keyboard key states */
+.key.correct {
+    background-color: #538d4e;
+}
+
+.key.present {
+    background-color: #b59f3b;
+}
+
+.key.absent {
+    background-color: #3a3a3c;
+}
+
+/* Restart button */
+.restart-btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: #538d4e;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.05s ease;
+}
+
+.restart-btn:hover {
+    background-color: #6aad60;
+}
+
+.restart-btn:active {
+    transform: scale(0.95);
+}
+
+/* Responsive design for tablets */
+@media (max-width: 768px) {
+    .tile {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+    }
+
+    .key {
+        min-width: 38px;
+        height: 52px;
+        font-size: 12px;
+    }
+
+    .key.wide {
+        min-width: 58px;
+    }
+
+    header h1 {
+        font-size: 30px;
+    }
+}
+
+/* Responsive design for mobile */
+@media (max-width: 480px) {
+    .tile {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .key {
+        min-width: 32px;
+        height: 48px;
+        font-size: 11px;
+    }
+
+    .key.wide {
+        min-width: 50px;
+    }
+
+    header h1 {
+        font-size: 26px;
+    }
+
+    .keyboard {
+        gap: 4px;
+    }
+
+    .keyboard-row {
+        gap: 4px;
+    }
+}
+
+@media (max-width: 380px) {
+    .tile {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+
+    .key {
+        min-width: 28px;
+        height: 44px;
+        font-size: 10px;
+    }
+
+    .key.wide {
+        min-width: 45px;
+    }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WORDLE</h1>
+        </header>
+
+        <!-- Message display area -->
+        <div id="message" class="message"></div>
+
+        <!-- Game board - 6 rows of 5 tiles -->
+        <div id="board" class="board"></div>
+
+        <!-- On-screen keyboard -->
+        <div id="keyboard" class="keyboard"></div>
+
+        <!-- Restart button -->
+        <button id="restart-btn" class="restart-btn">Restart Game</button>
+    </div>
+
+    <!-- Load word list first, then game logic -->
+    <script src="words.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
