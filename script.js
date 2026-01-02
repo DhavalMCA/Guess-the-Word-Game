@@ -1,4 +1,6 @@
-// Game state variables
+// ==============================
+// GAME STATE VARIABLES
+// ==============================
 let secretWord = '';
 let currentRow = 0;
 let currentTile = 0;
@@ -6,22 +8,32 @@ let gameOver = false;
 let board = [];
 let keyboard = {};
 
-// DOM elements
+// ==============================
+// FILTER WORD LIST (IMPORTANT FIX)
+// ==============================
+// Keep ONLY 5-letter words
+const FIVE_LETTER_WORDS = VALID_WORDS.filter(word => word.length === 5);
+
+// ==============================
+// DOM ELEMENTS
+// ==============================
 const boardElement = document.getElementById('board');
 const keyboardElement = document.getElementById('keyboard');
 const messageElement = document.getElementById('message');
 const restartBtn = document.getElementById('restart-btn');
 
-// Keyboard layout
+// ==============================
+// KEYBOARD LAYOUT
+// ==============================
 const keys = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
     ['BACK', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'ENTER']
 ];
 
-/**
- * Initialize and start the game
- */
+// ==============================
+// START GAME
+// ==============================
 function startGame() {
     secretWord = generateRandomWord();
     currentRow = 0;
@@ -29,200 +41,181 @@ function startGame() {
     gameOver = false;
     board = [];
     keyboard = {};
-    
-    // Log secret word for testing
-    console.log('Secret word:', secretWord);
-    
+
+    console.log('Secret word:', secretWord); // for testing
+
     createBoard();
     createKeyboard();
-    
-    // Clear any messages
+
     messageElement.textContent = '';
     messageElement.className = 'message';
 }
 
-/**
- * Generate a random word from the valid words list
- * @returns {string} Random 5-letter word in uppercase
- */
+// ==============================
+// RANDOM WORD GENERATOR (FIXED)
+// ==============================
 function generateRandomWord() {
-    const randomIndex = Math.floor(Math.random() * VALID_WORDS.length);
-    return VALID_WORDS[randomIndex].toUpperCase();
+    const randomIndex = Math.floor(Math.random() * FIVE_LETTER_WORDS.length);
+    return FIVE_LETTER_WORDS[randomIndex].toUpperCase();
 }
 
-/**
- * Create the 6x5 game board
- */
+// ==============================
+// CREATE BOARD (6x5)
+// ==============================
 function createBoard() {
     boardElement.innerHTML = '';
-    
+
     for (let i = 0; i < 6; i++) {
         const row = document.createElement('div');
         row.className = 'row';
-        row.setAttribute('data-row', i);
-        
+        row.dataset.row = i;
+
         const rowTiles = [];
-        
+
         for (let j = 0; j < 5; j++) {
             const tile = document.createElement('div');
             tile.className = 'tile';
-            tile.setAttribute('data-row', i);
-            tile.setAttribute('data-col', j);
+            tile.dataset.row = i;
+            tile.dataset.col = j;
             row.appendChild(tile);
             rowTiles.push(tile);
         }
-        
+
         boardElement.appendChild(row);
         board.push(rowTiles);
     }
 }
 
-/**
- * Create the on-screen QWERTY keyboard
- */
+// ==============================
+// CREATE KEYBOARD
+// ==============================
 function createKeyboard() {
     keyboardElement.innerHTML = '';
-    
+
     keys.forEach(row => {
         const keyboardRow = document.createElement('div');
         keyboardRow.className = 'keyboard-row';
-        
+
         row.forEach(key => {
-            const keyButton = document.createElement('button');
-            keyButton.className = 'key';
-            keyButton.textContent = key;
-            
+            const keyBtn = document.createElement('button');
+            keyBtn.textContent = key;
+            keyBtn.className = 'key';
+
             if (key === 'ENTER' || key === 'BACK') {
-                keyButton.classList.add('wide');
+                keyBtn.classList.add('wide');
             }
-            
-            keyButton.addEventListener('click', () => handleKeyPress(key));
-            keyboardRow.appendChild(keyButton);
-            
-            // Store reference to key button
-            keyboard[key] = keyButton;
+
+            keyBtn.addEventListener('click', () => handleKeyPress(key));
+            keyboardRow.appendChild(keyBtn);
+            keyboard[key] = keyBtn;
         });
-        
+
         keyboardElement.appendChild(keyboardRow);
     });
 }
 
-/**
- * Handle keyboard input (both on-screen and physical)
- * @param {string} key - The key that was pressed
- */
+// ==============================
+// HANDLE KEY PRESS
+// ==============================
 function handleKeyPress(key) {
     if (gameOver) return;
-    
+
     if (key === 'ENTER') {
-        if (currentTile === 5) {
-            checkGuess();
-        }
-    } else if (key === 'BACK') {
+        if (currentTile === 5) checkGuess();
+        return;
+    }
+
+    if (key === 'BACK') {
         if (currentTile > 0) {
             currentTile--;
-            const tile = board[currentRow][currentTile];
-            tile.textContent = '';
-            tile.classList.remove('filled');
+            board[currentRow][currentTile].textContent = '';
+            board[currentRow][currentTile].classList.remove('filled');
         }
-    } else {
-        if (currentTile < 5) {
-            const tile = board[currentRow][currentTile];
-            tile.textContent = key;
-            tile.classList.add('filled', 'pop');
-            
-            // Remove pop animation after it completes
-            setTimeout(() => {
-                tile.classList.remove('pop');
-            }, 150);
-            
-            currentTile++;
-        }
+        return;
+    }
+
+    if (currentTile < 5) {
+        const tile = board[currentRow][currentTile];
+        tile.textContent = key;
+        tile.classList.add('filled', 'pop');
+
+        setTimeout(() => tile.classList.remove('pop'), 150);
+        currentTile++;
     }
 }
 
-/**
- * Check if a word exists in the valid words list
- * @param {string} word - The word to validate
- * @returns {boolean} True if word is valid
- */
+// ==============================
+// VALID WORD CHECK (FIXED)
+// ==============================
 function isValidWord(word) {
-    return VALID_WORDS.includes(word.toLowerCase());
+    return FIVE_LETTER_WORDS.includes(word.toLowerCase());
 }
 
-/**
- * Show invalid word error message and shake animation
- */
+// ==============================
+// INVALID WORD MESSAGE
+// ==============================
 function showInvalidWordMessage() {
-    messageElement.textContent = '❌ Word is not in the list';
+    messageElement.textContent = '❌ Word not in list';
     messageElement.className = 'message error';
-    
-    // Add shake animation to current row
-    const currentRowElement = boardElement.querySelector(`[data-row="${currentRow}"]`);
-    currentRowElement.classList.add('shake');
-    
-    // Remove shake animation and error message after 1 second
+
+    const rowEl = boardElement.querySelector(`[data-row="${currentRow}"]`);
+    rowEl.classList.add('shake');
+
     setTimeout(() => {
-        currentRowElement.classList.remove('shake');
+        rowEl.classList.remove('shake');
         messageElement.textContent = '';
         messageElement.className = 'message';
     }, 1000);
 }
 
-/**
- * Check the current guess and update tile colors
- */
+// ==============================
+// CHECK GUESS
+// ==============================
 function checkGuess() {
-    const guess = board[currentRow].map(tile => tile.textContent).join('');
-    
-    // Validate word first
+    const guess = board[currentRow].map(t => t.textContent).join('');
+
     if (!isValidWord(guess)) {
         showInvalidWordMessage();
         return;
     }
-    
-    // Create arrays to track letter usage
-    const secretLetters = secretWord.split('');
-    const guessLetters = guess.split('');
-    const tileStatuses = Array(5).fill('');
-    
-    // First pass: Mark correct letters (green)
+
+    const secretArr = secretWord.split('');
+    const guessArr = guess.split('');
+    const status = Array(5).fill('');
+
+    // Correct letters
     for (let i = 0; i < 5; i++) {
-        if (guessLetters[i] === secretLetters[i]) {
-            tileStatuses[i] = 'correct';
-            secretLetters[i] = null; // Mark as used
+        if (guessArr[i] === secretArr[i]) {
+            status[i] = 'correct';
+            secretArr[i] = null;
         }
     }
-    
-    // Second pass: Mark present letters (yellow)
+
+    // Present / absent letters
     for (let i = 0; i < 5; i++) {
-        if (tileStatuses[i] === '') {
-            const letterIndex = secretLetters.indexOf(guessLetters[i]);
-            if (letterIndex !== -1) {
-                tileStatuses[i] = 'present';
-                secretLetters[letterIndex] = null; // Mark as used
+        if (!status[i]) {
+            const idx = secretArr.indexOf(guessArr[i]);
+            if (idx !== -1) {
+                status[i] = 'present';
+                secretArr[idx] = null;
             } else {
-                tileStatuses[i] = 'absent';
+                status[i] = 'absent';
             }
         }
     }
-    
-    // Animate tiles with flip effect (staggered)
-    board[currentRow].forEach((tile, index) => {
+
+    board[currentRow].forEach((tile, i) => {
         setTimeout(() => {
             tile.classList.add('flip');
-            
+
             setTimeout(() => {
-                tile.classList.add(tileStatuses[index]);
+                tile.classList.add(status[i]);
                 tile.classList.remove('flip');
-                
-                // Update keyboard colors
-                updateKeyboard(guessLetters[index], tileStatuses[index]);
+                updateKeyboard(guessArr[i], status[i]);
             }, 250);
-        }, index * 100);
+        }, i * 100);
     });
-    
-    // Check win/lose after animations complete
+
     setTimeout(() => {
         if (guess === secretWord) {
             handleWin();
@@ -232,70 +225,57 @@ function checkGuess() {
             currentRow++;
             currentTile = 0;
         }
-    }, 5 * 100 + 500);
+    }, 1000);
 }
 
-/**
- * Update keyboard key colors based on guess results
- * @param {string} letter - The letter to update
- * @param {string} status - The status (correct, present, or absent)
- */
+// ==============================
+// UPDATE KEYBOARD COLORS
+// ==============================
 function updateKeyboard(letter, status) {
     const key = keyboard[letter];
     if (!key) return;
-    
-    // Priority: correct > present > absent
-    // Don't downgrade a key's status
+
     if (key.classList.contains('correct')) return;
     if (key.classList.contains('present') && status !== 'correct') return;
-    
+
     key.classList.remove('correct', 'present', 'absent');
     key.classList.add(status);
 }
 
-/**
- * Handle win condition
- */
+// ==============================
+// WIN / LOSE
+// ==============================
 function handleWin() {
     gameOver = true;
     messageElement.textContent = '🎉 You Win!';
     messageElement.className = 'message success';
 }
 
-/**
- * Handle lose condition
- */
 function handleLose() {
     gameOver = true;
-    messageElement.textContent = `❌ Game Over! The word was ${secretWord}`;
+    messageElement.textContent = `❌ Game Over! Word was ${secretWord}`;
     messageElement.className = 'message game-over';
 }
 
-/**
- * Restart the game
- */
-function restartGame() {
-    startGame();
-}
+// ==============================
+// RESTART
+// ==============================
+restartBtn.addEventListener('click', startGame);
 
-// Event listeners
-restartBtn.addEventListener('click', restartGame);
-
-// Physical keyboard support
-document.addEventListener('keydown', (e) => {
+// ==============================
+// PHYSICAL KEYBOARD SUPPORT
+// ==============================
+document.addEventListener('keydown', e => {
     if (gameOver) return;
-    
+
     const key = e.key.toUpperCase();
-    
-    if (key === 'ENTER') {
-        handleKeyPress('ENTER');
-    } else if (key === 'BACKSPACE') {
-        handleKeyPress('BACK');
-    } else if (/^[A-Z]$/.test(key)) {
-        handleKeyPress(key);
-    }
+
+    if (key === 'ENTER') handleKeyPress('ENTER');
+    else if (key === 'BACKSPACE') handleKeyPress('BACK');
+    else if (/^[A-Z]$/.test(key)) handleKeyPress(key);
 });
 
-// Start the game when page loads
-
+// ==============================
+// INIT
+// ==============================
 startGame();
